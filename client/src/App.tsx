@@ -9,13 +9,13 @@ import Dashboard from "@/pages/dashboard";
 import Guests from "@/pages/guests";
 import Budget from "@/pages/budget";
 import Venues from "@/pages/venues";
-import Flowers from "@/pages/flowers";
+import Services from "@/pages/services";
 import Dresses from "@/pages/dresses";
 import Timeline from "@/pages/timeline";
 import Vendors from "@/pages/vendors";
 import Setup from "@/pages/setup";
 import Layout from "@/components/layout";
-import { getWeddingDetails, saveWeddingDetails, type WeddingDetails } from "@/lib/storage";
+import { getWeddingDetails, saveWeddingDetails, initializeDefaultData, type WeddingDetails } from "@/lib/storage";
 
 function AppRouter() {
   return (
@@ -25,7 +25,7 @@ function AppRouter() {
         <Route path="/guests" component={Guests} />
         <Route path="/budget" component={Budget} />
         <Route path="/venues" component={Venues} />
-        <Route path="/flowers" component={Flowers} />
+        <Route path="/services" component={Services} />
         <Route path="/dresses" component={Dresses} />
         <Route path="/timeline" component={Timeline} />
         <Route path="/vendors" component={Vendors} />
@@ -42,6 +42,10 @@ function App() {
   useEffect(() => {
     const weddingDetails = getWeddingDetails();
     setIsSetupComplete(!!weddingDetails);
+    
+    // Initialize default data on first load
+    initializeDefaultData();
+    
     setIsLoading(false);
   }, []);
 

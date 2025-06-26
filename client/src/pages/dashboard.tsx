@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Users, DollarSign, CheckCircle, Building, Calendar, CalendarDays } from "lucide-react";
-import { getWeddingDetails } from "@/lib/storage";
+import { getWeddingDetails, getGuests, getBudgetCategories, getTasks, getVendors } from "@/lib/storage";
 import type { Guest, BudgetCategory, Task, Vendor } from "@shared/schema";
 
 function WelcomeBanner() {

@@ -42,7 +42,7 @@ export default function Setup({ onComplete }: SetupProps) {
             <Heart className="w-8 h-8 text-pastel-green-600" />
           </div>
           <CardTitle className="text-2xl font-heading font-bold text-gray-800">
-            Welcome to Blissful Planner
+            Welcome to Bliss
           </CardTitle>
           <p className="text-gray-600 mt-2">
             Let's get started by setting up your wedding details

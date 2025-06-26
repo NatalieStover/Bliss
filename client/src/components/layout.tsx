@@ -15,7 +15,7 @@ const navigation = [
   { name: "Guests", href: "/guests" },
   { name: "Budget", href: "/budget" },
   { name: "Venues", href: "/venues" },
-  { name: "Flowers", href: "/flowers" },
+  { name: "Services", href: "/services" },
   { name: "Dresses", href: "/dresses" },
   { name: "Timeline", href: "/timeline" },
   { name: "Vendors", href: "/vendors" },
@@ -36,7 +36,7 @@ export default function Layout({ children }: LayoutProps) {
                 <Heart className="w-5 h-5 text-pastel-green-600" />
               </div>
               <h1 className="text-lg font-inter font-medium text-gray-800">
-                Blissful Planner
+                Bliss
               </h1>
             </div>
 

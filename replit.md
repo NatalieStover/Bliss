@@ -1,8 +1,8 @@
-# Blissful Planner - Wedding Planning App
+# Bliss - Wedding Planning App
 
 ## Overview
 
-Blissful Planner is a comprehensive wedding planning application built as a full-stack web application. It helps couples organize their wedding by managing guests, budget, venues, flowers, dresses, timeline tasks, and vendors all in one place. The app features a modern, responsive design with a pastel green color scheme and provides an intuitive user experience for wedding planning.
+Bliss is a comprehensive wedding planning application built as a client-side web application with local storage. It helps couples organize their wedding by managing guests, budget, venues, services, dresses, timeline tasks, and vendors all in one place. The app features a modern, responsive design with a pastel green color scheme and provides an intuitive user experience for wedding planning. All data is stored locally in the browser for privacy and immediate access.
 
 ## System Architecture
 
