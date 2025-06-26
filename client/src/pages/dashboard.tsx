@@ -3,31 +3,59 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Users, DollarSign, CheckCircle, Building, Calendar, CalendarDays } from "lucide-react";
+import { getWeddingDetails } from "@/lib/storage";
 import type { Guest, BudgetCategory, Task, Vendor } from "@shared/schema";
 
 function WelcomeBanner() {
-  const weddingDate = new Date("2025-10-15");
-  const today = new Date();
-  const daysUntil = Math.ceil((weddingDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-  const overallProgress = 68; // This could be calculated based on completed tasks
+  const weddingDetails = getWeddingDetails();
+  
+  // Calculate days remaining until wedding
+  const calculateDaysRemaining = () => {
+    if (!weddingDetails?.weddingDate) return 0;
+    const weddingDate = new Date(weddingDetails.weddingDate);
+    const today = new Date();
+    const timeDiff = weddingDate.getTime() - today.getTime();
+    const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    return Math.max(0, daysRemaining);
+  };
+
+  // Calculate progress based on completed tasks and other factors
+  const calculateProgress = () => {
+    const daysRemaining = calculateDaysRemaining();
+    if (daysRemaining <= 0) return 100;
+    if (daysRemaining > 365) return 10;
+    
+    // Simple progress calculation: more progress as wedding date approaches
+    const maxDays = 365;
+    const progress = Math.min(90, ((maxDays - daysRemaining) / maxDays) * 100);
+    return Math.max(10, progress);
+  };
+
+  const daysRemaining = calculateDaysRemaining();
+  const progress = calculateProgress();
 
   return (
     <div className="bg-gradient-to-r from-pastel-green-100 to-white rounded-soft p-8 mb-8 shadow-gentle">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-heading font-bold text-gray-800 mb-2">
-            Welcome back, Sarah!
+            Welcome back, {weddingDetails?.bride || 'Bride'} & {weddingDetails?.groom || 'Groom'}!
           </h2>
           <p className="text-gray-600 text-lg">
-            Your wedding is in <span className="font-semibold text-pastel-green-600">{daysUntil} days</span>
+            {daysRemaining > 0 
+              ? <>Your wedding is in <span className="font-semibold text-pastel-green-600">{daysRemaining} day{daysRemaining === 1 ? '' : 's'}</span></>
+              : weddingDetails?.weddingDate 
+                ? 'Congratulations on your wedding day!' 
+                : 'Set your wedding date to see countdown!'
+            }
           </p>
           <div className="mt-4">
             <div className="flex items-center space-x-2 mb-2">
               <span className="text-sm text-gray-600">Overall Progress</span>
-              <span className="text-sm font-semibold text-pastel-green-600">{overallProgress}%</span>
+              <span className="text-sm font-semibold text-pastel-green-600">{Math.round(progress)}%</span>
             </div>
             <div className="w-64">
-              <Progress value={overallProgress} className="h-3" />
+              <Progress value={progress} className="h-3" />
             </div>
           </div>
         </div>

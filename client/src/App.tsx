@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -12,9 +13,11 @@ import Flowers from "@/pages/flowers";
 import Dresses from "@/pages/dresses";
 import Timeline from "@/pages/timeline";
 import Vendors from "@/pages/vendors";
+import Setup from "@/pages/setup";
 import Layout from "@/components/layout";
+import { getWeddingDetails, saveWeddingDetails, type WeddingDetails } from "@/lib/storage";
 
-function Router() {
+function AppRouter() {
   return (
     <Layout>
       <Switch>
@@ -33,11 +36,35 @@ function Router() {
 }
 
 function App() {
+  const [isSetupComplete, setIsSetupComplete] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const weddingDetails = getWeddingDetails();
+    setIsSetupComplete(!!weddingDetails);
+    setIsLoading(false);
+  }, []);
+
+  const handleSetupComplete = (details: WeddingDetails) => {
+    saveWeddingDetails(details);
+    setIsSetupComplete(true);
+  };
+
+  if (isLoading) {
+    return <div className="min-h-screen bg-pastel-green-50 flex items-center justify-center">
+      <div className="text-gray-600">Loading...</div>
+    </div>;
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <Router />
+        {!isSetupComplete ? (
+          <Setup onComplete={handleSetupComplete} />
+        ) : (
+          <AppRouter />
+        )}
       </TooltipProvider>
     </QueryClientProvider>
   );

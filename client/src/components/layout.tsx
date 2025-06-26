@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Heart, Menu, X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { getWeddingDetails } from "@/lib/storage";
 import MobileNav from "./mobile-nav";
 
 interface LayoutProps {
@@ -29,22 +30,22 @@ export default function Layout({ children }: LayoutProps) {
       {/* Header */}
       <header className="bg-white shadow-gentle sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <div className="bg-pastel-green-200 p-2 rounded-soft">
-                <Heart className="w-8 h-8 text-pastel-green-600" />
+          <div className="flex justify-between items-center h-14">
+            <div className="flex items-center space-x-3">
+              <div className="bg-pastel-green-200 p-1.5 rounded-soft">
+                <Heart className="w-5 h-5 text-pastel-green-600" />
               </div>
-              <h1 className="text-2xl font-heading font-semibold text-gray-800">
+              <h1 className="text-lg font-inter font-medium text-gray-800">
                 Blissful Planner
               </h1>
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-8">
+            <nav className="hidden md:flex space-x-6">
               {navigation.map((item) => (
                 <Link key={item.name} href={item.href}>
                   <span
-                    className={`font-medium transition-colors ${
+                    className={`text-sm font-inter font-medium transition-colors ${
                       location === item.href
                         ? "text-pastel-green-600"
                         : "text-gray-600 hover:text-pastel-green-600"
@@ -56,9 +57,15 @@ export default function Layout({ children }: LayoutProps) {
               ))}
             </nav>
 
-            <div className="flex items-center space-x-4">
-              <Button variant="secondary" className="bg-pastel-green-200 hover:bg-pastel-green-300 text-pastel-green-700 rounded-soft">
-                Sarah & John
+            <div className="flex items-center space-x-3">
+              <Button variant="secondary" className="bg-pastel-green-200 hover:bg-pastel-green-300 text-pastel-green-700 rounded-soft text-sm px-3 py-1.5 h-auto">
+                {(() => {
+                  const weddingDetails = getWeddingDetails();
+                  if (weddingDetails) {
+                    return `${weddingDetails.bride} & ${weddingDetails.groom}`;
+                  }
+                  return "Wedding Couple";
+                })()}
               </Button>
 
               {/* Mobile menu button */}
