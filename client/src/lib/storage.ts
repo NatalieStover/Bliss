@@ -331,49 +331,6 @@ export function deleteTask(id: number): boolean {
   return true;
 }
 
-// Venue storage functions
-export function getVenues(): Venue[] {
-  const data = localStorage.getItem('venues');
-  return data ? JSON.parse(data) : [];
-}
-
-export function saveVenue(venue: InsertVenue): void {
-  const venues = getVenues();
-  const newVenue: Venue = {
-    ...venue,
-    id: Date.now(), // Simple ID generation
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-  venues.push(newVenue);
-  localStorage.setItem('venues', JSON.stringify(venues));
-}
-
-export function updateVenue(id: number, venueData: InsertVenue): boolean {
-  const venues = getVenues();
-  const index = venues.findIndex(v => v.id === id);
-  if (index !== -1) {
-    venues[index] = {
-      ...venues[index],
-      ...venueData,
-      updatedAt: new Date(),
-    };
-    localStorage.setItem('venues', JSON.stringify(venues));
-    return true;
-  }
-  return false;
-}
-
-export function deleteVenue(id: number): boolean {
-  const venues = getVenues();
-  const filteredVenues = venues.filter(v => v.id !== id);
-  if (filteredVenues.length !== venues.length) {
-    localStorage.setItem('venues', JSON.stringify(filteredVenues));
-    return true;
-  }
-  return false;
-}
-
 // Initialize with some default data if storage is empty
 export function initializeDefaultData(): void {
   // Budget categories start empty so users can customize from 0
