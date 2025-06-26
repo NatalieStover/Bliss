@@ -39,17 +39,24 @@ export default function EnhancedDressForm({ dress, onSuccess }: DressFormProps) 
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (files) {
-      const fileArray = Array.from(files);
-      fileArray.forEach((file) => {
-        if (!file.type.startsWith('image/')) {
-          toast({
-            title: "Invalid file",
-            description: "Please select only image files.",
-            variant: "destructive",
-          });
-          return;
-        }
+    if (!files || files.length === 0) {
+      console.log('No files selected');
+      return;
+    }
+
+    console.log(`Processing ${files.length} files`);
+
+    Array.from(files).forEach(file => {
+      console.log(`Processing file: ${file.name}, type: ${file.type}`);
+
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file",
+          description: "Please select only image files.",
+          variant: "destructive",
+        });
+        return;
+      }
 
         // Check file size (limit to 5MB)
         if (file.size > 5 * 1024 * 1024) {
@@ -63,8 +70,16 @@ export default function EnhancedDressForm({ dress, onSuccess }: DressFormProps) 
 
         const reader = new FileReader();
         reader.onload = (e) => {
-          if (e.target?.result) {
-            setPhotos(prev => [...prev, e.target!.result as string]);
+          const result = e.target?.result as string;
+          console.log('File read successfully, result length:', result?.length);
+
+          if (result) {
+            setPhotos(prev => {
+              const newPhotos = [...prev, result];
+              console.log('Photos updated, total count:', newPhotos.length);
+              form.setValue("photos", newPhotos);
+              return newPhotos;
+            });
           }
         };
         reader.onerror = () => {
@@ -76,7 +91,8 @@ export default function EnhancedDressForm({ dress, onSuccess }: DressFormProps) 
         };
         reader.readAsDataURL(file);
       });
-      // Clear the input after processing
+
+      // Clear the input to allow re-uploading the same file
       event.target.value = '';
     }
   };
