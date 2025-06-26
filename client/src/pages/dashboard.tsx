@@ -1,8 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Users, DollarSign, CheckCircle, Building, Calendar, CalendarDays } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Users, DollarSign, CheckCircle, Building, Calendar, CalendarDays, ArrowRight } from "lucide-react";
 import { getWeddingDetails, getGuests, getBudgetCategories, getTasks, getVendors } from "@/lib/storage";
 import type { Guest, BudgetCategory, Task, Vendor } from "@shared/schema";
 
@@ -50,9 +52,18 @@ function WelcomeBanner() {
             }
           </p>
           <div className="mt-4">
-            <div className="flex items-center space-x-2 mb-2">
-              <span className="text-sm text-gray-600">Overall Progress</span>
-              <span className="text-sm font-semibold text-pastel-green-600">{Math.round(progress)}%</span>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600">Overall Progress</span>
+                <span className="text-sm font-semibold text-pastel-green-600">{Math.round(progress)}%</span>
+              </div>
+              <Link href="/timeline">
+                <Button variant="outline" size="sm" className="flex items-center space-x-1">
+                  <Calendar className="w-4 h-4" />
+                  <span>View Timeline</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Button>
+              </Link>
             </div>
             <div className="w-64">
               <Progress value={progress} className="h-3" />
@@ -129,6 +140,29 @@ function QuickStats() {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       {stats.map((stat) => {
         const Icon = stat.icon;
+        const isTasksCard = stat.title === "Tasks Complete";
+        
+        if (isTasksCard) {
+          return (
+            <Link key={stat.title} href="/timeline">
+              <Card className="hover-lift cursor-pointer">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">{stat.title}</p>
+                      <p className="text-2xl font-heading font-bold text-gray-800">{stat.value}</p>
+                      <p className="text-xs text-gray-600">{stat.subtitle}</p>
+                    </div>
+                    <div className={`p-3 rounded-gentle ${stat.color}`}>
+                      <Icon className="w-6 h-6" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          );
+        }
+        
         return (
           <Card key={stat.title} className="hover-lift cursor-pointer">
             <CardContent className="p-6">
