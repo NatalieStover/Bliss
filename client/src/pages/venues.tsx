@@ -73,11 +73,6 @@ export default function Venues() {
     loadVenues(); // Reload venues after form success
   };
 
-  const handleEditVenue = (venue: Venue) => {
-    setSelectedVenue(venue);
-    setIsFormOpen(true);
-  };
-
   if (isLoading) {
     return (
       <div className="space-y-6">

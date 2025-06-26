@@ -1,13 +1,12 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { saveVenue, updateVenue } from "@/lib/storage";
 import { insertVenueSchema, type Venue, type InsertVenue } from "@shared/schema";
 
 interface VenueFormProps {
@@ -35,35 +34,31 @@ export default function VenueForm({ venue, onSuccess }: VenueFormProps) {
     },
   });
 
-  const mutation = useMutation({
-    mutationFn: async (data: InsertVenue) => {
+  const handleSubmit = (data: InsertVenue) => {
+    try {
       if (venue) {
-        const response = await apiRequest("PUT", `/api/venues/${venue.id}`, data);
-        return response.json();
+        const success = updateVenue(venue.id, data);
+        if (!success) throw new Error("Failed to update venue");
       } else {
-        const response = await apiRequest("POST", "/api/venues", data);
-        return response.json();
+        saveVenue(data);
       }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/venues"] });
+      
       toast({
         title: "Success",
         description: venue ? "Venue updated successfully" : "Venue created successfully",
       });
       onSuccess?.();
-    },
-    onError: () => {
+    } catch (error) {
       toast({
         title: "Error",
         description: "Failed to save venue",
         variant: "destructive",
       });
-    },
-  });
+    }
+  };
 
   const onSubmit = (data: InsertVenue) => {
-    mutation.mutate(data);
+    handleSubmit(data);
   };
 
   return (
@@ -227,10 +222,9 @@ export default function VenueForm({ venue, onSuccess }: VenueFormProps) {
         <div className="flex justify-end space-x-2 pt-4">
           <Button
             type="submit"
-            disabled={mutation.isPending}
             className="bg-blue-400 hover:bg-blue-500 text-white"
           >
-            {mutation.isPending ? "Saving..." : venue ? "Update Venue" : "Add Venue"}
+            {venue ? "Update Venue" : "Add Venue"}
           </Button>
         </div>
       </form>
