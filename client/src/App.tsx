@@ -16,6 +16,7 @@ import Vendors from "@/pages/vendors";
 import Setup from "@/pages/setup";
 import Layout from "@/components/layout";
 import { getWeddingDetails, saveWeddingDetails, initializeDefaultData, type WeddingDetails } from "@/lib/storage";
+import { InstallPrompt } from "./components/install-prompt";
 
 function AppRouter() {
   return (
@@ -42,10 +43,10 @@ function App() {
   useEffect(() => {
     const weddingDetails = getWeddingDetails();
     setIsSetupComplete(!!weddingDetails);
-    
+
     // Initialize default data on first load
     initializeDefaultData();
-    
+
     setIsLoading(false);
   }, []);
 
@@ -69,6 +70,7 @@ function App() {
         ) : (
           <AppRouter />
         )}
+        <InstallPrompt />
       </TooltipProvider>
     </QueryClientProvider>
   );
