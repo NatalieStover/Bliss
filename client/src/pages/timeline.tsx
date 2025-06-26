@@ -6,11 +6,15 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { CheckCircle, Clock, AlertCircle, Plus, Edit, Trash2, Search } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { CheckCircle, Clock, AlertCircle, Plus, Edit, Trash2, Search, CalendarIcon, X } from "lucide-react";
+import { format } from "date-fns";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import TaskForm from "@/components/task-form";
 import type { Task } from "@shared/schema";
+import { cn } from "@/lib/utils";
 
 export default function Timeline() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -61,6 +65,27 @@ export default function Timeline() {
       toast({
         title: "Error",
         description: "Failed to update task status",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateTaskMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: Partial<Task> }) => {
+      const response = await apiRequest("PUT", `/api/tasks/${id}`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
+      toast({
+        title: "Success",
+        description: "Task updated",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update task",
         variant: "destructive",
       });
     },
@@ -136,6 +161,13 @@ export default function Timeline() {
 
   const handleStatusChange = (taskId: number, newStatus: string) => {
     updateTaskStatusMutation.mutate({ id: taskId, status: newStatus });
+  };
+
+  const handleDateChange = (taskId: number, newDate: string | null) => {
+    updateTaskMutation.mutate({ 
+      id: taskId, 
+      data: { dueDate: newDate || "" }
+    });
   };
 
   const stats = {
@@ -314,12 +346,56 @@ export default function Timeline() {
                         )}
                         
                         <div className="flex items-center space-x-4 text-xs text-gray-500">
-                          {task.dueDate && (
-                            <span className={isOverdue ? "text-red-600 font-medium" : ""}>
-                              Due: {new Date(task.dueDate).toLocaleDateString()}
-                              {isOverdue && " (Overdue)"}
-                            </span>
-                          )}
+                          <div className="flex items-center space-x-2">
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className={cn(
+                                    "h-auto p-1 text-xs hover:bg-gray-100",
+                                    isOverdue ? "text-red-600 font-medium" : "text-gray-500"
+                                  )}
+                                >
+                                  <CalendarIcon className="mr-1 h-3 w-3" />
+                                  {task.dueDate ? (
+                                    <>
+                                      Due: {new Date(task.dueDate).toLocaleDateString()}
+                                      {isOverdue && " (Overdue)"}
+                                    </>
+                                  ) : (
+                                    "Set due date"
+                                  )}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                  mode="single"
+                                  selected={task.dueDate ? new Date(task.dueDate) : undefined}
+                                  onSelect={(date) => {
+                                    handleDateChange(task.id, date ? date.toISOString().split('T')[0] : null);
+                                  }}
+                                  disabled={(date) =>
+                                    date < new Date(new Date().setHours(0, 0, 0, 0))
+                                  }
+                                  initialFocus
+                                />
+                                {task.dueDate && (
+                                  <div className="p-3 border-t">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleDateChange(task.id, null)}
+                                      className="w-full"
+                                    >
+                                      <X className="mr-2 h-3 w-3" />
+                                      Clear date
+                                    </Button>
+                                  </div>
+                                )}
+                              </PopoverContent>
+                            </Popover>
+                          </div>
                           {task.category && <span>Category: {task.category}</span>}
                           {task.assignedTo && <span>Assigned to: {task.assignedTo}</span>}
                         </div>
