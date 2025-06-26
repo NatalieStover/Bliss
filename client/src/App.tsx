@@ -9,7 +9,7 @@ import Dashboard from "@/pages/dashboard";
 import Guests from "@/pages/guests";
 import Budget from "@/pages/budget";
 import Venues from "@/pages/venues";
-import Services from "@/pages/services";
+import Services from "@/pages/enhanced-services";
 import Dresses from "@/pages/dresses";
 import Timeline from "@/pages/timeline";
 import Vendors from "@/pages/vendors";

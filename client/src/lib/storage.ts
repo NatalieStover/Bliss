@@ -82,7 +82,7 @@ export function getGuests(): Guest[] {
 
 export function saveGuest(guest: InsertGuest): Guest {
   const guests = getGuests();
-  const newGuest: Guest = { id: getNextId(), ...guest };
+  const newGuest = normalizeGuest(guest);
   guests.push(newGuest);
   saveToStorage(STORAGE_KEYS.guests, guests);
   return newGuest;
@@ -114,7 +114,7 @@ export function getBudgetCategories(): BudgetCategory[] {
 
 export function saveBudgetCategory(category: InsertBudgetCategory): BudgetCategory {
   const categories = getBudgetCategories();
-  const newCategory: BudgetCategory = { id: getNextId(), ...category };
+  const newCategory = normalizeBudgetCategory(category);
   categories.push(newCategory);
   saveToStorage(STORAGE_KEYS.budgetCategories, categories);
   return newCategory;
@@ -146,7 +146,7 @@ export function getBudgetExpenses(): BudgetExpense[] {
 
 export function saveBudgetExpense(expense: InsertBudgetExpense): BudgetExpense {
   const expenses = getBudgetExpenses();
-  const newExpense: BudgetExpense = { id: getNextId(), ...expense };
+  const newExpense = normalizeBudgetExpense(expense);
   expenses.push(newExpense);
   saveToStorage(STORAGE_KEYS.budgetExpenses, expenses);
   return newExpense;
@@ -178,7 +178,7 @@ export function getVenues(): Venue[] {
 
 export function saveVenue(venue: InsertVenue): Venue {
   const venues = getVenues();
-  const newVenue: Venue = { id: getNextId(), ...venue };
+  const newVenue = normalizeVenue(venue);
   venues.push(newVenue);
   saveToStorage(STORAGE_KEYS.venues, venues);
   return newVenue;
@@ -210,7 +210,7 @@ export function getServices(): Flower[] {
 
 export function saveService(service: InsertFlower): Flower {
   const services = getServices();
-  const newService: Flower = { id: getNextId(), ...service };
+  const newService = normalizeService(service);
   services.push(newService);
   saveToStorage(STORAGE_KEYS.services, services);
   return newService;
@@ -242,7 +242,7 @@ export function getDresses(): Dress[] {
 
 export function saveDress(dress: InsertDress): Dress {
   const dresses = getDresses();
-  const newDress: Dress = { id: getNextId(), ...dress };
+  const newDress = normalizeDress(dress);
   dresses.push(newDress);
   saveToStorage(STORAGE_KEYS.dresses, dresses);
   return newDress;
@@ -274,7 +274,7 @@ export function getVendors(): Vendor[] {
 
 export function saveVendor(vendor: InsertVendor): Vendor {
   const vendors = getVendors();
-  const newVendor: Vendor = { id: getNextId(), ...vendor };
+  const newVendor = normalizeVendor(vendor);
   vendors.push(newVendor);
   saveToStorage(STORAGE_KEYS.vendors, vendors);
   return newVendor;
@@ -306,7 +306,7 @@ export function getTasks(): Task[] {
 
 export function saveTask(task: InsertTask): Task {
   const tasks = getTasks();
-  const newTask: Task = { id: getNextId(), ...task };
+  const newTask = normalizeTask(task);
   tasks.push(newTask);
   saveToStorage(STORAGE_KEYS.tasks, tasks);
   return newTask;
@@ -333,16 +333,117 @@ export function deleteTask(id: number): boolean {
 
 // Initialize with some default data if storage is empty
 export function initializeDefaultData(): void {
-  if (getBudgetCategories().length === 0) {
-    const defaultCategories = [
-      { name: "Venue", budgetAmount: "8000", spentAmount: "0", color: "#10b981" },
-      { name: "Catering", budgetAmount: "5000", spentAmount: "0", color: "#f59e0b" },
-      { name: "Photography", budgetAmount: "3000", spentAmount: "0", color: "#8b5cf6" },
-      { name: "Flowers", budgetAmount: "1500", spentAmount: "0", color: "#06b6d4" },
-      { name: "Music", budgetAmount: "2000", spentAmount: "0", color: "#ef4444" },
-      { name: "Dress", budgetAmount: "2500", spentAmount: "0", color: "#ec4899" }
-    ];
-    
-    defaultCategories.forEach(category => saveBudgetCategory(category));
-  }
+  // Budget categories start empty so users can customize from 0
+  // No default budget categories are created
+}
+
+// Helper function to ensure proper default values for all fields
+function normalizeGuest(guest: InsertGuest): Guest {
+  return {
+    id: getNextId(),
+    name: guest.name,
+    address: guest.address ?? null,
+    email: guest.email ?? null,
+    phone: guest.phone ?? null,
+    rsvpStatus: guest.rsvpStatus ?? "pending",
+    plusOne: guest.plusOne ?? null,
+    dietaryRestrictions: guest.dietaryRestrictions ?? null,
+    notes: guest.notes ?? null
+  };
+}
+
+function normalizeBudgetCategory(category: InsertBudgetCategory): BudgetCategory {
+  return {
+    id: getNextId(),
+    name: category.name,
+    budgetAmount: category.budgetAmount,
+    spentAmount: category.spentAmount ?? "0",
+    color: category.color ?? "#10b981"
+  };
+}
+
+function normalizeBudgetExpense(expense: InsertBudgetExpense): BudgetExpense {
+  return {
+    id: getNextId(),
+    name: expense.name,
+    date: expense.date,
+    categoryId: expense.categoryId,
+    amount: expense.amount,
+    notes: expense.notes ?? null,
+    vendor: expense.vendor ?? null
+  };
+}
+
+function normalizeVenue(venue: InsertVenue): Venue {
+  return {
+    id: getNextId(),
+    name: venue.name,
+    address: venue.address ?? null,
+    email: venue.email ?? null,
+    phone: venue.phone ?? null,
+    website: venue.website ?? null,
+    capacity: venue.capacity ?? null,
+    price: venue.price ?? null,
+    status: venue.status ?? "considering",
+    photos: venue.photos ?? null,
+    notes: venue.notes ?? null
+  };
+}
+
+function normalizeService(service: InsertFlower): Flower {
+  return {
+    id: getNextId(),
+    name: service.name,
+    type: service.type,
+    description: service.description ?? null,
+    florist: service.florist ?? null,
+    price: service.price ?? null,
+    status: service.status ?? "considering",
+    photos: service.photos ?? null,
+    notes: service.notes ?? null
+  };
+}
+
+function normalizeDress(dress: InsertDress): Dress {
+  return {
+    id: getNextId(),
+    name: dress.name,
+    designer: dress.designer ?? null,
+    store: dress.store ?? null,
+    style: dress.style ?? null,
+    size: dress.size ?? null,
+    price: dress.price ?? null,
+    status: dress.status ?? "considering",
+    photos: dress.photos ?? null,
+    fittingDates: dress.fittingDates ?? null,
+    notes: dress.notes ?? null
+  };
+}
+
+function normalizeVendor(vendor: InsertVendor): Vendor {
+  return {
+    id: getNextId(),
+    name: vendor.name,
+    category: vendor.category,
+    email: vendor.email ?? null,
+    phone: vendor.phone ?? null,
+    website: vendor.website ?? null,
+    price: vendor.price ?? null,
+    status: vendor.status ?? "considering",
+    notes: vendor.notes ?? null,
+    contact: vendor.contact ?? null
+  };
+}
+
+function normalizeTask(task: InsertTask): Task {
+  return {
+    id: getNextId(),
+    title: task.title,
+    description: task.description ?? null,
+    category: task.category ?? null,
+    dueDate: task.dueDate ?? null,
+    priority: task.priority ?? "medium",
+    status: task.status ?? "pending",
+    assignedTo: task.assignedTo ?? null
+  };
 }
