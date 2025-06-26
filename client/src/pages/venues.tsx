@@ -1,44 +1,48 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Building, Plus, Edit, Trash2, Phone, Mail, Globe, MapPin } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import VenueForm from "@/components/venue-form";
+import { getVenues, deleteVenue } from "@/lib/storage";
 import type { Venue } from "@shared/schema";
 
 export default function Venues() {
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [venues, setVenues] = useState<Venue[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
-  const { data: venues = [], isLoading } = useQuery<Venue[]>({
-    queryKey: ["/api/venues"],
-  });
+  useEffect(() => {
+    loadVenues();
+  }, []);
 
-  const deleteVenueMutation = useMutation({
-    mutationFn: async (id: number) => {
-      await apiRequest("DELETE", `/api/venues/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/venues"] });
+  const loadVenues = () => {
+    setIsLoading(true);
+    const venueData = getVenues();
+    setVenues(venueData);
+    setIsLoading(false);
+  };
+
+  const handleDeleteVenue = (id: number) => {
+    const success = deleteVenue(id);
+    if (success) {
+      loadVenues();
       toast({
         title: "Success",
         description: "Venue deleted successfully",
       });
-    },
-    onError: () => {
+    } else {
       toast({
         title: "Error",
         description: "Failed to delete venue",
         variant: "destructive",
       });
-    },
-  });
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -66,6 +70,12 @@ export default function Venues() {
   const handleFormSuccess = () => {
     setIsFormOpen(false);
     setSelectedVenue(null);
+    loadVenues(); // Reload venues after form success
+  };
+
+  const handleEditVenue = (venue: Venue) => {
+    setSelectedVenue(venue);
+    setIsFormOpen(true);
   };
 
   if (isLoading) {
@@ -207,8 +217,7 @@ export default function Venues() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => deleteVenueMutation.mutate(venue.id)}
-                      disabled={deleteVenueMutation.isPending}
+                      onClick={() => handleDeleteVenue(venue.id)}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>

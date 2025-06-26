@@ -1,15 +1,13 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
 import { insertGuestSchema, type Guest, type InsertGuest } from "@shared/schema";
+import { saveGuest, updateGuest } from "@/lib/storage";
+import { useToast } from "@/hooks/use-toast";
 
 interface GuestFormProps {
   guest?: Guest | null;
@@ -18,7 +16,6 @@ interface GuestFormProps {
 
 export default function GuestForm({ guest, onSuccess }: GuestFormProps) {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   const form = useForm<InsertGuest>({
     resolver: zodResolver(insertGuestSchema),
@@ -34,40 +31,39 @@ export default function GuestForm({ guest, onSuccess }: GuestFormProps) {
     },
   });
 
-  const mutation = useMutation({
-    mutationFn: async (data: InsertGuest) => {
+  const handleSubmit = async (data: InsertGuest) => {
+    try {
       if (guest) {
-        const response = await apiRequest("PUT", `/api/guests/${guest.id}`, data);
-        return response.json();
+        const result = updateGuest(guest.id, data);
+        if (result) {
+          toast({
+            title: "Success",
+            description: "Guest updated successfully",
+          });
+          onSuccess?.();
+        } else {
+          throw new Error("Failed to update guest");
+        }
       } else {
-        const response = await apiRequest("POST", "/api/guests", data);
-        return response.json();
+        saveGuest(data);
+        toast({
+          title: "Success",
+          description: "Guest added successfully",
+        });
+        onSuccess?.();
       }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/guests"] });
-      toast({
-        title: "Success",
-        description: guest ? "Guest updated successfully" : "Guest created successfully",
-      });
-      onSuccess?.();
-    },
-    onError: () => {
+    } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to save guest",
+        description: `Failed to ${guest ? "update" : "save"} guest`,
         variant: "destructive",
       });
-    },
-  });
-
-  const onSubmit = (data: InsertGuest) => {
-    mutation.mutate(data);
+    }
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"
@@ -197,12 +193,11 @@ export default function GuestForm({ guest, onSuccess }: GuestFormProps) {
         />
 
         <div className="flex justify-end space-x-2">
-          <Button
-            type="submit"
-            disabled={mutation.isPending}
+          <Button 
+            type="submit" 
             className="bg-pastel-green-400 hover:bg-pastel-green-500 text-white"
           >
-            {mutation.isPending ? "Saving..." : guest ? "Update Guest" : "Add Guest"}
+            {guest ? "Update Guest" : "Add Guest"}
           </Button>
         </div>
       </form>

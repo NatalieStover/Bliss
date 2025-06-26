@@ -1,46 +1,50 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Search, Plus, Edit, Trash2, Users } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import GuestForm from "@/components/guest-form";
+import { getGuests, deleteGuest } from "@/lib/storage";
 import type { Guest } from "@shared/schema";
 
 export default function Guests() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGuest, setSelectedGuest] = useState<Guest | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [guests, setGuests] = useState<Guest[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
-  const { data: guests = [], isLoading } = useQuery<Guest[]>({
-    queryKey: ["/api/guests"],
-  });
+  useEffect(() => {
+    loadGuests();
+  }, []);
 
-  const deleteGuestMutation = useMutation({
-    mutationFn: async (id: number) => {
-      await apiRequest("DELETE", `/api/guests/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/guests"] });
+  const loadGuests = () => {
+    setIsLoading(true);
+    const guestData = getGuests();
+    setGuests(guestData);
+    setIsLoading(false);
+  };
+
+  const handleDeleteGuest = (id: number) => {
+    const success = deleteGuest(id);
+    if (success) {
+      loadGuests();
       toast({
         title: "Success",
         description: "Guest deleted successfully",
       });
-    },
-    onError: () => {
+    } else {
       toast({
         title: "Error",
         description: "Failed to delete guest",
         variant: "destructive",
       });
-    },
-  });
+    }
+  };
 
   const filteredGuests = guests.filter(guest =>
     guest.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -78,6 +82,7 @@ export default function Guests() {
   const handleFormSuccess = () => {
     setIsFormOpen(false);
     setSelectedGuest(null);
+    loadGuests(); // Reload guests after form success
   };
 
   if (isLoading) {
@@ -226,8 +231,7 @@ export default function Guests() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => deleteGuestMutation.mutate(guest.id)}
-                      disabled={deleteGuestMutation.isPending}
+                      onClick={() => handleDeleteGuest(guest.id)}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
