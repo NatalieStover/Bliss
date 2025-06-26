@@ -44,34 +44,53 @@ export default function EnhancedVenueForm({ venue, onSuccess }: VenueFormProps) 
     }
 
     console.log(`Processing ${files.length} files`);
-    
+
     Array.from(files).forEach(file => {
       console.log(`Processing file: ${file.name}, type: ${file.type}`);
-      
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const result = e.target?.result as string;
-          console.log('File read successfully, result length:', result?.length);
-          
-          if (result) {
-            setPhotos(prev => {
-              const newPhotos = [...prev, result];
-              console.log('Photos updated, total count:', newPhotos.length);
-              form.setValue("photos", newPhotos);
-              return newPhotos;
-            });
-          }
-        };
-        reader.onerror = (e) => {
-          console.error('FileReader error:', e);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        console.log('File rejected - not an image:', file.type);
+
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file",
+          description: "Please select only image files.",
+          variant: "destructive",
+        });
+        return;
       }
+
+      // Check file size (limit to 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please select images smaller than 5MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        console.log('File read successfully, result length:', result?.length);
+
+        if (result) {
+          setPhotos(prev => {
+            const newPhotos = [...prev, result];
+            console.log('Photos updated, total count:', newPhotos.length);
+            form.setValue("photos", newPhotos);
+            return newPhotos;
+          });
+        }
+      };
+      reader.onerror = () => {
+        toast({
+          title: "Error",
+          description: "Failed to upload image. Please try again.",
+          variant: "destructive",
+        });
+      };
+      reader.readAsDataURL(file);
     });
-    
+
     // Clear the input to allow re-uploading the same file
     event.target.value = '';
   };
@@ -97,7 +116,7 @@ export default function EnhancedVenueForm({ venue, onSuccess }: VenueFormProps) 
   const onSubmit = (data: InsertVenue) => {
     try {
       const venueData = { ...data, photos };
-      
+
       if (venue) {
         updateVenue(venue.id, venueData);
         toast({
@@ -111,7 +130,7 @@ export default function EnhancedVenueForm({ venue, onSuccess }: VenueFormProps) 
           description: "Venue added successfully",
         });
       }
-      
+
       form.reset();
       setPhotos([]);
       onSuccess?.();
@@ -309,7 +328,7 @@ export default function EnhancedVenueForm({ venue, onSuccess }: VenueFormProps) 
               </div>
             </label>
           </div>
-          
+
           {photos.length > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4">
               {photos.map((photo, index) => (

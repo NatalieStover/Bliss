@@ -36,27 +36,46 @@ export default function ServiceForm({ service, onSuccess }: ServiceFormProps) {
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (!files) return;
+    if (files) {
+      const fileArray = Array.from(files);
+      fileArray.forEach((file) => {
+        if (!file.type.startsWith('image/')) {
+          toast({
+            title: "Invalid file",
+            description: "Please select only image files.",
+            variant: "destructive",
+          });
+          return;
+        }
 
-    Array.from(files).forEach(file => {
-      if (file.type.startsWith('image/')) {
+        // Check file size (limit to 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          toast({
+            title: "File too large",
+            description: "Please select images smaller than 5MB.",
+            variant: "destructive",
+          });
+          return;
+        }
+
         const reader = new FileReader();
         reader.onload = (e) => {
-          const result = e.target?.result as string;
-          if (result) {
-            setPhotos(prev => {
-              const newPhotos = [...prev, result];
-              form.setValue("photos", newPhotos);
-              return newPhotos;
-            });
+          if (e.target?.result) {
+            setPhotos(prev => [...prev, e.target!.result as string]);
           }
         };
+        reader.onerror = () => {
+          toast({
+            title: "Error",
+            description: "Failed to upload image. Please try again.",
+            variant: "destructive",
+          });
+        };
         reader.readAsDataURL(file);
-      }
-    });
-    
-    // Clear the input to allow re-uploading the same file
-    event.target.value = '';
+      });
+      // Clear the input after processing
+      event.target.value = '';
+    }
   };
 
   const removePhoto = (index: number) => {
@@ -68,7 +87,7 @@ export default function ServiceForm({ service, onSuccess }: ServiceFormProps) {
   const onSubmit = (data: InsertFlower) => {
     try {
       const serviceData = { ...data, photos };
-      
+
       if (service) {
         updateService(service.id, serviceData);
         toast({
@@ -82,7 +101,7 @@ export default function ServiceForm({ service, onSuccess }: ServiceFormProps) {
           description: "Service added successfully",
         });
       }
-      
+
       form.reset();
       setPhotos([]);
       onSuccess?.();
@@ -251,7 +270,7 @@ export default function ServiceForm({ service, onSuccess }: ServiceFormProps) {
               </div>
             </label>
           </div>
-          
+
           {photos.length > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4">
               {photos.map((photo, index) => (
