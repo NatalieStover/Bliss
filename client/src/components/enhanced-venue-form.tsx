@@ -38,22 +38,37 @@ export default function EnhancedVenueForm({ venue, onSuccess }: VenueFormProps) 
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (!files) return;
+    if (!files || files.length === 0) {
+      console.log('No files selected');
+      return;
+    }
 
+    console.log(`Processing ${files.length} files`);
+    
     Array.from(files).forEach(file => {
+      console.log(`Processing file: ${file.name}, type: ${file.type}`);
+      
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = (e) => {
           const result = e.target?.result as string;
+          console.log('File read successfully, result length:', result?.length);
+          
           if (result) {
             setPhotos(prev => {
               const newPhotos = [...prev, result];
+              console.log('Photos updated, total count:', newPhotos.length);
               form.setValue("photos", newPhotos);
               return newPhotos;
             });
           }
         };
+        reader.onerror = (e) => {
+          console.error('FileReader error:', e);
+        };
         reader.readAsDataURL(file);
+      } else {
+        console.log('File rejected - not an image:', file.type);
       }
     });
     

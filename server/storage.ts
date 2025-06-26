@@ -84,20 +84,8 @@ export class MemStorage implements IStorage {
   }
 
   private initializeDefaultData() {
-    // Initialize with default budget categories
-    const defaultCategories = [
-      { name: "Venue", budgetAmount: "10000", spentAmount: "8500", color: "#66BB6A" },
-      { name: "Catering", budgetAmount: "6000", spentAmount: "4200", color: "#FB8C00" },
-      { name: "Photography", budgetAmount: "3500", spentAmount: "2800", color: "#9C27B0" },
-      { name: "Flowers", budgetAmount: "2500", spentAmount: "1840", color: "#2196F3" },
-      { name: "Music", budgetAmount: "1500", spentAmount: "0", color: "#4CAF50" },
-      { name: "Dress", budgetAmount: "1500", spentAmount: "1200", color: "#FF4081" }
-    ];
-
-    defaultCategories.forEach(category => {
-      const id = this.currentId++;
-      this.budgetCategories.set(id, { id, ...category });
-    });
+    // App starts completely fresh with no default data
+    // Users can create their own budget categories starting from 0
   }
 
   // Guest methods
