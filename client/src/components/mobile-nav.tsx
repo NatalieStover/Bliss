@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Home, Users, DollarSign, Building, Flower, Shirt } from "lucide-react";
+import { Home, Users, DollarSign, Building, Briefcase, Shirt } from "lucide-react";
 
 interface MobileNavProps {
   currentPath: string;
@@ -10,7 +10,7 @@ const navItems = [
   { name: "Guests", href: "/guests", icon: Users },
   { name: "Budget", href: "/budget", icon: DollarSign },
   { name: "Venues", href: "/venues", icon: Building },
-  { name: "Flowers", href: "/flowers", icon: Flower },
+  { name: "Services", href: "/services", icon: Briefcase },
 ];
 
 export default function MobileNav({ currentPath }: MobileNavProps) {

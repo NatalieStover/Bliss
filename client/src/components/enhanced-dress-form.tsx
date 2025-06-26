@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Camera } from "lucide-react";
 import { insertDressSchema, type Dress, type InsertDress } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { saveDress, updateDress } from "@/lib/storage";
@@ -45,8 +45,11 @@ export default function EnhancedDressForm({ dress, onSuccess }: DressFormProps) 
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
-        setPhotos(prev => [...prev, result]);
-        form.setValue("photos", [...photos, result]);
+        setPhotos(prev => {
+          const newPhotos = [...prev, result];
+          form.setValue("photos", newPhotos);
+          return newPhotos;
+        });
       };
       reader.readAsDataURL(file);
     });
@@ -227,46 +230,46 @@ export default function EnhancedDressForm({ dress, onSuccess }: DressFormProps) 
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           <FormLabel>Photos</FormLabel>
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => document.getElementById('dress-photo-upload')?.click()}
-              className="flex items-center gap-2"
-            >
-              <Upload className="h-4 w-4" />
-              Add Photos
-            </Button>
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-pastel-green-400 transition-colors">
             <input
-              id="dress-photo-upload"
               type="file"
               accept="image/*"
               multiple
               className="hidden"
+              id="dress-photo-upload"
               onChange={handleImageUpload}
             />
+            <label htmlFor="dress-photo-upload" className="cursor-pointer block">
+              <div className="space-y-2">
+                <div className="mx-auto w-12 h-12 bg-pastel-green-100 rounded-full flex items-center justify-center">
+                  <Camera className="w-6 h-6 text-pastel-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Click to choose photos from your gallery</p>
+                  <p className="text-xs text-gray-500">PNG, JPG up to 10MB each</p>
+                </div>
+              </div>
+            </label>
           </div>
           
           {photos.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4">
               {photos.map((photo, index) => (
-                <div key={index} className="relative">
+                <div key={index} className="relative group">
                   <img
                     src={photo}
                     alt={`Dress photo ${index + 1}`}
-                    className="w-full h-24 object-cover rounded border"
+                    className="w-full h-24 object-cover rounded-lg border"
                   />
-                  <Button
+                  <button
                     type="button"
-                    variant="destructive"
-                    size="sm"
-                    className="absolute top-1 right-1 h-6 w-6 p-0"
                     onClick={() => removePhoto(index)}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <X className="h-3 w-3" />
-                  </Button>
+                    ×
+                  </button>
                 </div>
               ))}
             </div>

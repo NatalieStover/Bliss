@@ -2,7 +2,14 @@
 
 ## Overview
 
-Bliss is a comprehensive wedding planning application built as a client-side web application with local storage. It helps couples organize their wedding by managing guests, budget, venues, services, dresses, timeline tasks, and vendors all in one place. The app features a modern, responsive design with a pastel green color scheme and provides an intuitive user experience for wedding planning. All data is stored locally in the browser for privacy and immediate access.
+Bliss is a comprehensive wedding planning application built as a client-side web application with local storage. It helps couples organize their wedding by managing guests, budget, venues, general wedding services (makeup, hair, photography, etc.), dresses, timeline tasks, and vendors all in one place. The app features a modern, responsive design with a pastel green color scheme and provides an intuitive user experience for wedding planning. All data is stored locally in the browser for privacy and immediate access.
+
+Key features include:
+- Photo upload capability for venues, dresses, and services from device gallery
+- Working phone and email functionality with clickable links
+- Budget system starting at 0 for easy customization
+- General wedding services instead of flower-specific functionality
+- Complete offline functionality with local storage
 
 ## System Architecture
 
@@ -87,11 +94,17 @@ The build process:
 2. Backend compiles to `dist/index.js` using esbuild
 3. Production server serves static files and API from single process
 
-## Changelog
+## Recent Changes
 
 ```
-Changelog:
-- June 26, 2025. Initial setup
+Recent Changes:
+- June 26, 2025: Enhanced photo upload functionality implemented for venues, dresses, and services
+- June 26, 2025: Removed non-functional flower page and updated navigation
+- June 26, 2025: Fixed budget system to start at 0 for easy customization
+- June 26, 2025: Implemented working phone and email functionality in venue forms
+- June 26, 2025: Converted services from flower-specific to general wedding services
+- June 26, 2025: All data migrated to local storage for offline functionality
+- June 26, 2025: Initial setup completed
 ```
 
 ## User Preferences
