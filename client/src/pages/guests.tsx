@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Search, Plus, Edit, Trash2, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import GuestForm from "@/components/guest-form";
@@ -125,6 +125,9 @@ export default function Guests() {
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{selectedGuest ? "Edit Guest" : "Add New Guest"}</DialogTitle>
+              <DialogDescription>
+                {selectedGuest ? "Update guest information and RSVP status." : "Add a new guest to your wedding list."}
+              </DialogDescription>
             </DialogHeader>
             <GuestForm guest={selectedGuest} onSuccess={handleFormSuccess} />
           </DialogContent>
