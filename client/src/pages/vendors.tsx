@@ -295,6 +295,31 @@ export default function Vendors() {
                     )}
                   </div>
 
+                  {vendor.photos && vendor.photos.length > 0 && (
+                    <div className="mb-3">
+                      <p className="text-xs text-gray-500 mb-2">Photos:</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {vendor.photos.slice(0, 2).map((photo, index) => (
+                          <img
+                            key={index}
+                            src={photo}
+                            alt={`${vendor.name} photo ${index + 1}`}
+                            className="w-full h-16 object-cover rounded border"
+                            onError={(e) => {
+                              console.error('Image failed to load:', photo);
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        ))}
+                      </div>
+                      {vendor.photos.length > 2 && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          +{vendor.photos.length - 2} more photos
+                        </p>
+                      )}
+                    </div>
+                  )}
+
                   <div className="flex items-center justify-end space-x-2 pt-2 border-t">
                     <Button
                       variant="ghost"

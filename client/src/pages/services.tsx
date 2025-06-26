@@ -159,19 +159,24 @@ export default function Services() {
 
                 {service.photos && service.photos.length > 0 && (
                   <div className="mb-3">
+                    <p className="text-xs text-gray-500 mb-2">Photos:</p>
                     <div className="grid grid-cols-2 gap-2">
-                      {service.photos.slice(0, 2).map((photo, index) => (
+                      {service.photos.slice(0, 4).map((photo, index) => (
                         <img
                           key={index}
                           src={photo}
-                          alt={`${service.name} ${index + 1}`}
-                          className="w-full h-20 object-cover rounded"
+                          alt={`${service.name} photo ${index + 1}`}
+                          className="w-full h-16 object-cover rounded border"
+                          onError={(e) => {
+                            console.error('Image failed to load:', photo);
+                            e.currentTarget.style.display = 'none';
+                          }}
                         />
                       ))}
                     </div>
-                    {service.photos.length > 2 && (
+                    {service.photos.length > 4 && (
                       <p className="text-xs text-gray-500 mt-1">
-                        +{service.photos.length - 2} more photos
+                        +{service.photos.length - 4} more photos
                       </p>
                     )}
                   </div>

@@ -36,6 +36,43 @@ export default function EnhancedVenueForm({ venue, onSuccess }: VenueFormProps) 
     },
   });
 
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions (max 800px width/height)
+        const maxSize = 800;
+        let { width, height } = img;
+        
+        if (width > height) {
+          if (width > maxSize) {
+            height = (height * maxSize) / width;
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width = (width * maxSize) / height;
+            height = maxSize;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress
+        ctx?.drawImage(img, 0, 0, width, height);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        resolve(compressedDataUrl);
+      };
+      
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) {
@@ -45,7 +82,7 @@ export default function EnhancedVenueForm({ venue, onSuccess }: VenueFormProps) 
 
     console.log(`Processing ${files.length} files`);
 
-    Array.from(files).forEach(file => {
+    Array.from(files).forEach(async file => {
       console.log(`Processing file: ${file.name}, type: ${file.type}`);
 
       if (!file.type.startsWith('image/')) {
@@ -55,6 +92,24 @@ export default function EnhancedVenueForm({ venue, onSuccess }: VenueFormProps) 
           variant: "destructive",
         });
         return;
+      }
+
+      try {
+        const compressedImage = await compressImage(file);
+        console.log('Image compressed successfully');
+
+        setPhotos(prev => {
+          const newPhotos = [...prev, compressedImage];
+          console.log('Photos updated, total count:', newPhotos.length);
+          form.setValue("photos", newPhotos);
+          return newPhotos;
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to process image. Please try again.",
+          variant: "destructive",
+        });
       }
 
       // Check file size (limit to 5MB)

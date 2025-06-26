@@ -34,6 +34,43 @@ export default function ServiceForm({ service, onSuccess }: ServiceFormProps) {
     },
   });
 
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions (max 800px width/height)
+        const maxSize = 800;
+        let { width, height } = img;
+        
+        if (width > height) {
+          if (width > maxSize) {
+            height = (height * maxSize) / width;
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width = (width * maxSize) / height;
+            height = maxSize;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress
+        ctx?.drawImage(img, 0, 0, width, height);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        resolve(compressedDataUrl);
+      };
+      
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) {
@@ -43,7 +80,7 @@ export default function ServiceForm({ service, onSuccess }: ServiceFormProps) {
 
     console.log(`Processing ${files.length} files`);
 
-    Array.from(files).forEach(file => {
+    Array.from(files).forEach(async file => {
       console.log(`Processing file: ${file.name}, type: ${file.type}`);
 
       if (!file.type.startsWith('image/')) {
@@ -55,38 +92,23 @@ export default function ServiceForm({ service, onSuccess }: ServiceFormProps) {
         return;
       }
 
-      // Check file size (limit to 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: "File too large",
-          description: "Please select images smaller than 5MB.",
-          variant: "destructive",
+      try {
+        const compressedImage = await compressImage(file);
+        console.log('Image compressed successfully');
+
+        setPhotos(prev => {
+          const newPhotos = [...prev, compressedImage];
+          console.log('Photos updated, total count:', newPhotos.length);
+          form.setValue("photos", newPhotos);
+          return newPhotos;
         });
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        console.log('File read successfully, result length:', result?.length);
-
-        if (result) {
-          setPhotos(prev => {
-            const newPhotos = [...prev, result];
-            console.log('Photos updated, total count:', newPhotos.length);
-            form.setValue("photos", newPhotos);
-            return newPhotos;
-          });
-        }
-      };
-      reader.onerror = () => {
+      } catch (error) {
         toast({
           title: "Error",
-          description: "Failed to upload image. Please try again.",
+          description: "Failed to process image. Please try again.",
           variant: "destructive",
         });
-      };
-      reader.readAsDataURL(file);
+      }
     });
 
     // Clear the input to allow re-uploading the same file
