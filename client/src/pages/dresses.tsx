@@ -130,7 +130,7 @@ export default function Dresses() {
               Add Dress
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{selectedDress ? "Edit Dress" : "Add New Dress"}</DialogTitle>
             </DialogHeader>

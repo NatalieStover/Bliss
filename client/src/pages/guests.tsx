@@ -117,7 +117,7 @@ export default function Guests() {
               Add Guest
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{selectedGuest ? "Edit Guest" : "Add New Guest"}</DialogTitle>
             </DialogHeader>

@@ -106,7 +106,7 @@ export default function Services() {
               Add Service
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {selectedService ? "Edit Service" : "Add New Service"}
@@ -136,7 +136,7 @@ export default function Services() {
                     Add Service
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Add New Service</DialogTitle>
                   </DialogHeader>
