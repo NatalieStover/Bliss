@@ -1,0 +1,95 @@
+The Netlify deploy errored, with the following guidance provided:
+
+**Diagnosis:**
+The build is failing at the "build.command" stage with exit code 127, specifically because the command `npm run build` is unable to find the "vite" package as indicated by the error `sh: 1: vite: not found` (#L55).
+
+**Solution:**
+1. Verify that the "vite" package is listed as a dependency in the project's `package.json` file or was committed to the repository.
+2. If "vite" is missing, add it to the project's dependencies by running:
+   ```bash
+   npm install vite --save-dev
+   ```
+3. Ensure that the "vite" package is correctly installed and available in the project before running the build command again.
+
+The relevant error logs are:
+
+Line 0: Waiting for other deploys from your team to complete. Check the queue: https://app.netlify.com/teams/stovernatalie2004/builds
+Line 1: build-image version: 6f83bce77ef8222ef18a4c24513dd2659d320e50 (noble)
+Line 2: buildbot version: 6f83bce77ef8222ef18a4c24513dd2659d320e50
+Line 3: Fetching cached dependencies
+Line 4: Failed to fetch cache, continuing with build
+Line 5: Starting to prepare the repo for build
+Line 6: No cached dependencies found. Cloning fresh repo
+Line 7: git clone --filter=blob:none https://github.com/NatalieStover/Bliss
+Line 8: Preparing Git Reference refs/heads/main
+Line 9: Custom publish path detected. Proceeding with the specified path: 'client/dist'
+Line 10: Starting to install dependencies
+Line 11: Using PHP version
+Line 12: Downloading and installing node v20.19.3...
+Line 13: Downloading https://nodejs.org/dist/v20.19.3/node-v20.19.3-linux-x64.tar.xz...
+Line 14: Computing checksum with sha256sum
+Line 16: Now using node v20.19.3 (npm v10.8.2)
+Line 17: Enabling Node.js Corepack
+Line 18: Started restoring cached build plugins
+Line 19: Finished restoring cached build plugins
+Line 20: Successfully installed dependencies
+Line 21: Starting build script
+Line 22: Detected 2 framework(s)
+Line 23: "hydrogen" at version "unknown"
+Line 24: "remix" at version "unknown"
+Line 25: Section completed: initializing
+Line 26: Failed during stage 'building site': Build script returned non-zero exit code: 2
+Line 27: [96m[1m​[22m[39m
+Line 28: [96m[1mNetlify Build                                                 [22m[39m
+Line 29: [96m[1m────────────────────────────────────────────────────────────────[22m[39m
+Line 30: [36m[1m​[22m[39m
+Line 31: [36m[1m❯ Version[22m[39m
+Line 32:   @netlify/build 33.4.6
+Line 33: [36m[1m​[22m[39m
+Line 34: [36m[1m❯ Flags[22m[39m
+Line 35:   accountId: 678be47b1da089f1d5e11e82
+Line 36:   baseRelDir: true
+Line 47:   production
+Line 48: [96m[1m​[22m[39m
+Line 49: [96m[1mbuild.command from netlify.toml                               [22m[39m
+Line 50: [96m[1m────────────────────────────────────────────────────────────────[22m[39m
+Line 51: ​
+Line 52: [36m$ npm run build[39m
+Line 53: > rest-express@1.0.0 build
+Line 54: > vite build
+Line 55: sh: 1: vite: not found
+Line 56: [91m[1m​[22m[39m
+Line 57: [91m[1m"build.command" failed                                        [22m[39m
+Line 58: [91m[1m────────────────────────────────────────────────────────────────[22m[39m
+Line 59: ​
+Line 60:   [31m[1mError message[22m[39m
+Line 61:   Command failed with exit code 127: npm run build
+Line 62: ​
+Line 63:   [31m[1mError location[22m[39m
+Line 64:   In build.command from netlify.toml:
+Line 65:   npm run build
+Line 66: ​
+Line 67:   [31m[1mResolved config[22m[39m
+Line 68:   build:
+Line 69:     base: /opt/build/repo/client
+Line 70:     command: npm run build
+Line 71:     commandOrigin: config
+Line 72:     environment:
+Line 73:       - NODE_VERSION
+Line 75:     publishOrigin: config
+Line 76:   headers:
+Line 77:     - for: /manifest.json
+Line 78:       values:
+Line 79:         Content-Type: application/manifest+json
+Line 80:     - for: /sw.js
+Line 81:       values:
+Line 82:         Content-Type: application/javascript
+Line 83:         Service-Worker-Allowed: /
+Line 84:     - for: /*
+      values:
+        Referrer-Policy: strict-origin-when-cross-origin
+        X-Frame-Options: DENY
+        X-XSS
+Line 85: Build failed due to a user error: Build script returned non-zero exit code: 2
+Line 86: Failing build: Failed to build site
+Line 87: Finished processing build request in 11.595s
