@@ -21,16 +21,12 @@ function WelcomeBanner() {
     return Math.max(0, daysRemaining);
   };
 
-  // Calculate progress based on completed tasks and other factors
+  // Calculate progress based on completed tasks
   const calculateProgress = () => {
-    const daysRemaining = calculateDaysRemaining();
-    if (daysRemaining <= 0) return 100;
-    if (daysRemaining > 365) return 10;
-    
-    // Simple progress calculation: more progress as wedding date approaches
-    const maxDays = 365;
-    const progress = Math.min(90, ((maxDays - daysRemaining) / maxDays) * 100);
-    return Math.max(10, progress);
+    const tasks = getTasks();
+    if (tasks.length === 0) return 0;
+    const completedTasks = tasks.filter(t => t.status === "completed").length;
+    return Math.round((completedTasks / tasks.length) * 100);
   };
 
   const daysRemaining = calculateDaysRemaining();
@@ -52,18 +48,9 @@ function WelcomeBanner() {
             }
           </p>
           <div className="mt-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">Overall Progress</span>
-                <span className="text-sm font-semibold text-pastel-green-600">{Math.round(progress)}%</span>
-              </div>
-              <Link href="/timeline">
-                <Button variant="outline" size="sm" className="flex items-center space-x-1">
-                  <Calendar className="w-4 h-4" />
-                  <span>View Timeline</span>
-                  <ArrowRight className="w-3 h-3" />
-                </Button>
-              </Link>
+            <div className="flex items-center space-x-2 mb-2">
+              <span className="text-sm text-gray-600">Task Progress</span>
+              <span className="text-sm font-semibold text-pastel-green-600">{Math.round(progress)}%</span>
             </div>
             <div className="w-64">
               <Progress value={progress} className="h-3" />

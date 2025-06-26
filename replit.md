@@ -98,13 +98,14 @@ The build process:
 
 ```
 Recent Changes:
+- June 26, 2025: Fixed progress calculation to be based on completed tasks vs total tasks
+- June 26, 2025: Enhanced photo upload functionality with proper file validation and input clearing
+- June 26, 2025: Changed phone display to show information instead of clickable buttons
 - June 26, 2025: Added progress connection to timeline with clickable button and task completion card
 - June 26, 2025: Implemented bottom footer "More" button with full navigation access including timeline
 - June 26, 2025: Fixed scrolling issues for all large forms on big screens with proper overflow constraints
-- June 26, 2025: Enhanced photo upload functionality implemented for venues, dresses, and services
 - June 26, 2025: Removed non-functional flower page and updated navigation
 - June 26, 2025: Fixed budget system to start at 0 for easy customization
-- June 26, 2025: Implemented working phone and email functionality in venue forms
 - June 26, 2025: Converted services from flower-specific to general wedding services
 - June 26, 2025: All data migrated to local storage for offline functionality
 - June 26, 2025: Initial setup completed

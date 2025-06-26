@@ -174,22 +174,28 @@ export default function Venues() {
                     </div>
                   )}
 
+                  {venue.phone && (
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Phone className="w-4 h-4 mr-2" />
+                      <span>{venue.phone}</span>
+                    </div>
+                  )}
+                  
+                  {venue.email && (
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Mail className="w-4 h-4 mr-2" />
+                      <span className="truncate">{venue.email}</span>
+                    </div>
+                  )}
+                  
+                  {venue.website && (
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Globe className="w-4 h-4 mr-2" />
+                      <span className="truncate">{venue.website}</span>
+                    </div>
+                  )}
+
                   <div className="flex items-center space-x-2 pt-2">
-                    {venue.phone && (
-                      <Button variant="ghost" size="sm" className="p-1">
-                        <Phone className="w-4 h-4" />
-                      </Button>
-                    )}
-                    {venue.email && (
-                      <Button variant="ghost" size="sm" className="p-1">
-                        <Mail className="w-4 h-4" />
-                      </Button>
-                    )}
-                    {venue.website && (
-                      <Button variant="ghost" size="sm" className="p-1">
-                        <Globe className="w-4 h-4" />
-                      </Button>
-                    )}
                     <div className="flex-1"></div>
                     <Button
                       variant="ghost"

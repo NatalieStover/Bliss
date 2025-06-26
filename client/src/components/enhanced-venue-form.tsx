@@ -41,17 +41,24 @@ export default function EnhancedVenueForm({ venue, onSuccess }: VenueFormProps) 
     if (!files) return;
 
     Array.from(files).forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setPhotos(prev => {
-          const newPhotos = [...prev, result];
-          form.setValue("photos", newPhotos);
-          return newPhotos;
-        });
-      };
-      reader.readAsDataURL(file);
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const result = e.target?.result as string;
+          if (result) {
+            setPhotos(prev => {
+              const newPhotos = [...prev, result];
+              form.setValue("photos", newPhotos);
+              return newPhotos;
+            });
+          }
+        };
+        reader.readAsDataURL(file);
+      }
     });
+    
+    // Clear the input to allow re-uploading the same file
+    event.target.value = '';
   };
 
   const removePhoto = (index: number) => {
@@ -281,8 +288,8 @@ export default function EnhancedVenueForm({ venue, onSuccess }: VenueFormProps) 
                   <Camera className="w-6 h-6 text-pastel-green-600" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Click to choose photos from your gallery</p>
-                  <p className="text-xs text-gray-500">PNG, JPG up to 10MB each</p>
+                  <p className="text-sm text-gray-600">Click to add photos from your device</p>
+                  <p className="text-xs text-gray-500">Select multiple images at once</p>
                 </div>
               </div>
             </label>
