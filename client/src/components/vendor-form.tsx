@@ -10,8 +10,6 @@ import { Camera, Phone, Mail } from "lucide-react";
 import { insertVendorSchema, type Vendor, type InsertVendor } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { saveVendor, updateVendor } from "@/lib/storage";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 
 interface VendorFormProps {
   vendor?: Vendor | null;
@@ -31,7 +29,6 @@ const vendorCategories = [
 
 export default function VendorForm({ vendor, onSuccess }: VendorFormProps) {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [photos, setPhotos] = useState<string[]>(vendor?.photos || []);
 
   const form = useForm<InsertVendor>({
@@ -149,37 +146,36 @@ export default function VendorForm({ vendor, onSuccess }: VendorFormProps) {
     }
   };
 
-  const mutation = useMutation({
-    mutationFn: async (data: InsertVendor) => {
+  const onSubmit = async (data: InsertVendor) => {
+    try {
+      const vendorData = { ...data, photos };
+      
       if (vendor) {
-        const response = await apiRequest("PUT", `/api/vendors/${vendor.id}`, data);
-        return response.json();
+        const result = updateVendor(vendor.id, vendorData);
+        if (result) {
+          toast({
+            title: "Success",
+            description: "Vendor updated successfully",
+          });
+          onSuccess?.();
+        } else {
+          throw new Error("Failed to update vendor");
+        }
       } else {
-        const response = await apiRequest("POST", "/api/vendors", data);
-        return response.json();
+        saveVendor(vendorData);
+        toast({
+          title: "Success",
+          description: "Vendor created successfully",
+        });
+        onSuccess?.();
       }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/vendors"] });
-      toast({
-        title: "Success",
-        description: vendor ? "Vendor updated successfully" : "Vendor created successfully",
-      });
-      onSuccess?.();
-    },
-    onError: () => {
+    } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to save vendor",
+        description: `Failed to ${vendor ? "update" : "save"} vendor`,
         variant: "destructive",
       });
-    },
-  });
-
-
-  const onSubmit = (data: InsertVendor) => {
-    const vendorData = { ...data, photos };
-    mutation.mutate(vendorData);
+    }
   };
 
   return (
@@ -417,10 +413,9 @@ export default function VendorForm({ vendor, onSuccess }: VendorFormProps) {
         <div className="flex justify-end space-x-2 pt-4">
           <Button
             type="submit"
-            disabled={mutation.isPending}
             className="bg-teal-400 hover:bg-teal-500 text-white"
           >
-            {mutation.isPending ? "Saving..." : vendor ? "Update Vendor" : "Add Vendor"}
+            {vendor ? "Update Vendor" : "Add Vendor"}
           </Button>
         </div>
       </form>

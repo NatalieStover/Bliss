@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,9 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Building, Plus, Edit, Trash2, Search, Phone, Mail, Globe } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import VendorForm from "@/components/vendor-form";
+import { getVendors, deleteVendor } from "@/lib/storage";
 import type { Vendor } from "@shared/schema";
 
 export default function Vendors() {
@@ -18,32 +17,37 @@ export default function Vendors() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
-  const { data: vendors = [], isLoading } = useQuery<Vendor[]>({
-    queryKey: ["/api/vendors"],
-  });
+  useEffect(() => {
+    loadVendors();
+  }, []);
 
-  const deleteVendorMutation = useMutation({
-    mutationFn: async (id: number) => {
-      await apiRequest("DELETE", `/api/vendors/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/vendors"] });
+  const loadVendors = () => {
+    setIsLoading(true);
+    const vendorData = getVendors();
+    setVendors(vendorData);
+    setIsLoading(false);
+  };
+
+  const handleDeleteVendor = (id: number) => {
+    const success = deleteVendor(id);
+    if (success) {
+      loadVendors();
       toast({
         title: "Success",
         description: "Vendor deleted successfully",
       });
-    },
-    onError: () => {
+    } else {
       toast({
         title: "Error",
         description: "Failed to delete vendor",
         variant: "destructive",
       });
-    },
-  });
+    }
+  };
 
   const filteredVendors = vendors.filter(vendor => {
     const matchesSearch = vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -96,6 +100,7 @@ export default function Vendors() {
   const handleFormSuccess = () => {
     setIsFormOpen(false);
     setSelectedVendor(null);
+    loadVendors(); // Reload vendors after form success
   };
 
   const stats = {
@@ -331,8 +336,7 @@ export default function Vendors() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => deleteVendorMutation.mutate(vendor.id)}
-                      disabled={deleteVendorMutation.isPending}
+                      onClick={() => handleDeleteVendor(vendor.id)}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
