@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { insertGuestSchema, type Guest, type InsertGuest } from "@shared/schema";
 import { saveGuest, updateGuest } from "@/lib/storage";
 import { useToast } from "@/hooks/use-toast";
@@ -63,8 +64,9 @@ export default function GuestForm({ guest, onSuccess }: GuestFormProps) {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+    <ScrollArea className="h-96">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 pr-4">
         <FormField
           control={form.control}
           name="name"
@@ -203,5 +205,6 @@ export default function GuestForm({ guest, onSuccess }: GuestFormProps) {
         </div>
       </form>
     </Form>
+    </ScrollArea>
   );
 }
