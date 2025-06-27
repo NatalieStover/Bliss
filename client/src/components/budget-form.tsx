@@ -1,11 +1,10 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { saveBudgetCategory, updateBudgetCategory } from "@/lib/storage";
 import { insertBudgetCategorySchema, type BudgetCategory, type InsertBudgetCategory } from "@shared/schema";
 
 interface BudgetFormProps {
@@ -20,7 +19,6 @@ const predefinedColors = [
 
 export default function BudgetForm({ category, onSuccess }: BudgetFormProps) {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   const form = useForm<InsertBudgetCategory>({
     resolver: zodResolver(insertBudgetCategorySchema),
@@ -32,35 +30,34 @@ export default function BudgetForm({ category, onSuccess }: BudgetFormProps) {
     },
   });
 
-  const mutation = useMutation({
-    mutationFn: async (data: InsertBudgetCategory) => {
+  const onSubmit = (data: InsertBudgetCategory) => {
+    try {
       if (category) {
-        const response = await apiRequest("PUT", `/api/budget-categories/${category.id}`, data);
-        return response.json();
+        const success = updateBudgetCategory(category.id, data);
+        if (success) {
+          toast({
+            title: "Success",
+            description: "Category updated successfully",
+          });
+          onSuccess?.();
+        } else {
+          throw new Error("Update failed");
+        }
       } else {
-        const response = await apiRequest("POST", "/api/budget-categories", data);
-        return response.json();
+        saveBudgetCategory(data);
+        toast({
+          title: "Success",
+          description: "Category created successfully",
+        });
+        onSuccess?.();
       }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/budget-categories"] });
-      toast({
-        title: "Success",
-        description: category ? "Category updated successfully" : "Category created successfully",
-      });
-      onSuccess?.();
-    },
-    onError: () => {
+    } catch (error) {
       toast({
         title: "Error",
         description: "Failed to save category",
         variant: "destructive",
       });
-    },
-  });
-
-  const onSubmit = (data: InsertBudgetCategory) => {
-    mutation.mutate(data);
+    }
   };
 
   return (
@@ -151,10 +148,9 @@ export default function BudgetForm({ category, onSuccess }: BudgetFormProps) {
         <div className="flex justify-end space-x-2">
           <Button
             type="submit"
-            disabled={mutation.isPending}
             className="bg-orange-400 hover:bg-orange-500 text-white"
           >
-            {mutation.isPending ? "Saving..." : category ? "Update Category" : "Add Category"}
+            {category ? "Update Category" : "Add Category"}
           </Button>
         </div>
       </form>

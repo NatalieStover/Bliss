@@ -10,7 +10,7 @@ import { saveVenue, updateVenue } from "@/lib/storage";
 import type { Venue, InsertVenue } from "@shared/schema";
 import { z } from "zod";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
-import { useQueryClient } from "@tanstack/react-query";
+import { insertVenueSchema } from "@shared/schema";
 
 interface VenueFormProps {
   venue?: Venue | null;
@@ -21,7 +21,6 @@ interface VenueFormProps {
 
 export default function VenueForm({ venue, open, onOpenChange, onSuccess }: VenueFormProps) {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   const form = useForm<InsertVenue>({
     resolver: zodResolver(insertVenueSchema),

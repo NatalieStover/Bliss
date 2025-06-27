@@ -128,37 +128,23 @@ export default function DressForm({ dress, onSuccess }: DressFormProps) {
       const dressData = { ...data, photos, fittingDates };
 
       if (dress) {
-        updateDress(dress.id, dressData)
-          .then(() => {
-            toast({
-              title: "Success",
-              description: "Dress updated successfully",
-            });
-            onSuccess?.();
-          })
-          .catch(() => {
-            toast({
-              title: "Error",
-              description: "Failed to update dress",
-              variant: "destructive",
-            });
+        const success = updateDress(dress.id, dressData);
+        if (success) {
+          toast({
+            title: "Success",
+            description: "Dress updated successfully",
           });
+          onSuccess?.();
+        } else {
+          throw new Error("Update failed");
+        }
       } else {
-        saveDress(dressData)
-          .then(() => {
-            toast({
-              title: "Success",
-              description: "Dress created successfully",
-            });
-            onSuccess?.();
-          })
-          .catch(() => {
-            toast({
-              title: "Error",
-              description: "Failed to create dress",
-              variant: "destructive",
-            });
-          });
+        saveDress(dressData);
+        toast({
+          title: "Success",
+          description: "Dress created successfully",
+        });
+        onSuccess?.();
       }
     } catch (error) {
       toast({

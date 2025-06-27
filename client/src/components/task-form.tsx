@@ -1,13 +1,12 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { saveTask, updateTask } from "@/lib/storage";
 import { insertTaskSchema, type Task, type InsertTask } from "@shared/schema";
 
 interface TaskFormProps {
@@ -17,7 +16,6 @@ interface TaskFormProps {
 
 export default function TaskForm({ task, onSuccess }: TaskFormProps) {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   const form = useForm<InsertTask>({
     resolver: zodResolver(insertTaskSchema),
@@ -32,35 +30,34 @@ export default function TaskForm({ task, onSuccess }: TaskFormProps) {
     },
   });
 
-  const mutation = useMutation({
-    mutationFn: async (data: InsertTask) => {
+  const onSubmit = (data: InsertTask) => {
+    try {
       if (task) {
-        const response = await apiRequest("PUT", `/api/tasks/${task.id}`, data);
-        return response.json();
+        const success = updateTask(task.id, data);
+        if (success) {
+          toast({
+            title: "Success",
+            description: "Task updated successfully",
+          });
+          onSuccess?.();
+        } else {
+          throw new Error("Update failed");
+        }
       } else {
-        const response = await apiRequest("POST", "/api/tasks", data);
-        return response.json();
+        saveTask(data);
+        toast({
+          title: "Success",
+          description: "Task created successfully",
+        });
+        onSuccess?.();
       }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
-      toast({
-        title: "Success",
-        description: task ? "Task updated successfully" : "Task created successfully",
-      });
-      onSuccess?.();
-    },
-    onError: () => {
+    } catch (error) {
       toast({
         title: "Error",
         description: "Failed to save task",
         variant: "destructive",
       });
-    },
-  });
-
-  const onSubmit = (data: InsertTask) => {
-    mutation.mutate(data);
+    }
   };
 
   return (
@@ -197,10 +194,9 @@ export default function TaskForm({ task, onSuccess }: TaskFormProps) {
         <div className="flex justify-end space-x-2 pt-4">
           <Button
             type="submit"
-            disabled={mutation.isPending}
             className="bg-purple-400 hover:bg-purple-500 text-white"
           >
-            {mutation.isPending ? "Saving..." : task ? "Update Task" : "Add Task"}
+            {task ? "Update Task" : "Add Task"}
           </Button>
         </div>
       </form>
