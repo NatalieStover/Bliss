@@ -200,7 +200,7 @@ export default function VenueForm({ venue, open, onOpenChange, onSuccess }: Venu
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="max-h-60 overflow-y-auto">
                         <SelectItem value="considering">Considering</SelectItem>
                         <SelectItem value="visited">Visited</SelectItem>
                         <SelectItem value="booked">Booked</SelectItem>

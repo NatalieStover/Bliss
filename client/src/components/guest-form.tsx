@@ -136,7 +136,7 @@ export default function GuestForm({ guest, onSuccess }: GuestFormProps) {
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="max-h-60 overflow-y-auto">
                     <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="confirmed">Confirmed</SelectItem>
                     <SelectItem value="declined">Declined</SelectItem>

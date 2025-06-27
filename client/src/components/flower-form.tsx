@@ -94,7 +94,7 @@ export default function FlowerForm({ flower, onSuccess }: FlowerFormProps) {
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="max-h-60 overflow-y-auto">
                     <SelectItem value="bouquet">Bouquet</SelectItem>
                     <SelectItem value="centerpiece">Centerpiece</SelectItem>
                     <SelectItem value="ceremony">Ceremony</SelectItem>

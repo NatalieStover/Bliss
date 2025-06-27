@@ -255,7 +255,7 @@ export default function DressForm({ dress, onSuccess }: DressFormProps) {
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="max-h-60 overflow-y-auto">
                     <SelectItem value="considering">Considering</SelectItem>
                     <SelectItem value="trying-on">Trying On</SelectItem>
                     <SelectItem value="selected">Selected</SelectItem>

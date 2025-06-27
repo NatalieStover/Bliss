@@ -98,6 +98,7 @@ The build process:
 
 ```
 Recent Changes:
+- June 27, 2025: Added scrolling functionality to all select dropdowns across forms for better usability
 - June 27, 2025: Fixed Netlify deployment configuration for pure client-side app
 - June 27, 2025: Created standalone client build configuration with proper dependencies
 - June 27, 2025: Updated build process to work with local storage only (no backend required)
