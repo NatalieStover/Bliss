@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import { Switch, Route } from "wouter";
-// Removed query client imports since we're using localStorage only
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
-import Dashboard from "@/pages/dashboard";
-import Guests from "@/pages/guests";
+import Dashboard from "@/pages/simple-dashboard";
+import Guests from "@/pages/simple-guests";
 import Budget from "@/pages/budget";
 import Venues from "@/pages/venues";
 import Services from "@/pages/enhanced-services";

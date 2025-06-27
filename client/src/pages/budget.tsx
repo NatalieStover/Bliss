@@ -1,11 +1,10 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, DollarSign, Edit, Trash2 } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { getBudgetCategories, getBudgetExpenses, deleteBudgetCategory } from "@/lib/storage";
 import { useToast } from "@/hooks/use-toast";
 import BudgetForm from "@/components/budget-form";
 import type { BudgetCategory, BudgetExpense } from "@shared/schema";
@@ -14,35 +13,34 @@ export default function Budget() {
   const [selectedCategory, setSelectedCategory] = useState<BudgetCategory | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const [categories, setCategories] = useState<BudgetCategory[]>([]);
+  const [expenses, setExpenses] = useState<BudgetExpense[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { data: categories = [], isLoading } = useQuery<BudgetCategory[]>({
-    queryKey: ["/api/budget-categories"],
-  });
+  useEffect(() => {
+    setIsLoading(true);
+    setCategories(getBudgetCategories());
+    setExpenses(getBudgetExpenses());
+    setIsLoading(false);
+  }, []);
 
-  const { data: expenses = [] } = useQuery<BudgetExpense[]>({
-    queryKey: ["/api/budget-expenses"],
-  });
-
-  const deleteCategoryMutation = useMutation({
-    mutationFn: async (id: number) => {
-      await apiRequest("DELETE", `/api/budget-categories/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/budget-categories"] });
+  const handleDeleteCategory = (id: number) => {
+    const success = deleteBudgetCategory(id);
+    if (success) {
+      setCategories(getBudgetCategories());
+      setExpenses(getBudgetExpenses());
       toast({
         title: "Success",
         description: "Category deleted successfully",
       });
-    },
-    onError: () => {
+    } else {
       toast({
         title: "Error",
         description: "Failed to delete category",
         variant: "destructive",
       });
-    },
-  });
+    }
+  };
 
   const totalBudget = categories.reduce((sum, cat) => sum + parseFloat(cat.budgetAmount), 0);
   const totalSpent = categories.reduce((sum, cat) => sum + parseFloat(cat.spentAmount), 0);
@@ -158,8 +156,7 @@ export default function Budget() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => deleteCategoryMutation.mutate(category.id)}
-                      disabled={deleteCategoryMutation.isPending}
+                      onClick={() => handleDeleteCategory(category.id)}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>

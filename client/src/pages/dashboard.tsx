@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -70,21 +70,17 @@ function WelcomeBanner() {
 }
 
 function QuickStats() {
-  const { data: guests = [] } = useQuery<Guest[]>({
-    queryKey: ["/api/guests"],
-  });
+  const [guests, setGuests] = useState<Guest[]>([]);
+  const [budgetCategories, setBudgetCategories] = useState<BudgetCategory[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [vendors, setVendors] = useState<Vendor[]>([]);
 
-  const { data: budgetCategories = [] } = useQuery<BudgetCategory[]>({
-    queryKey: ["/api/budget-categories"],
-  });
-
-  const { data: tasks = [] } = useQuery<Task[]>({
-    queryKey: ["/api/tasks"],
-  });
-
-  const { data: vendors = [] } = useQuery<Vendor[]>({
-    queryKey: ["/api/vendors"],
-  });
+  useEffect(() => {
+    setGuests(getGuests());
+    setBudgetCategories(getBudgetCategories());
+    setTasks(getTasks());
+    setVendors(getVendors());
+  }, []);
 
   const confirmedGuests = guests.filter(g => g.rsvpStatus === "confirmed").length;
   const totalBudget = budgetCategories.reduce((sum, cat) => sum + parseFloat(cat.budgetAmount), 0);
@@ -172,9 +168,11 @@ function QuickStats() {
 }
 
 function RecentGuests() {
-  const { data: guests = [] } = useQuery<Guest[]>({
-    queryKey: ["/api/guests"],
-  });
+  const [guests, setGuests] = useState<Guest[]>([]);
+
+  useEffect(() => {
+    setGuests(getGuests());
+  }, []);
 
   const recentGuests = guests.slice(-5);
 
@@ -217,9 +215,11 @@ function RecentGuests() {
 }
 
 function UpcomingTasks() {
-  const { data: tasks = [] } = useQuery<Task[]>({
-    queryKey: ["/api/tasks"],
-  });
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  useEffect(() => {
+    setTasks(getTasks());
+  }, []);
 
   const upcomingTasks = tasks
     .filter(t => t.status !== "completed")
